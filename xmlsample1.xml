@@ -1,0 +1,7 @@
+<root>
+	<node1> Данные… </node1>
+	<node2 attribute=«something»>Данные Узла 2</node2>
+	<node3>
+		<node3sub1> ещё данные </node3sub1>
+	</node3>
+</root>

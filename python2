@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+mydict = {}
+u=u'я бог'
+mydict.append(u)
+print (mydict)

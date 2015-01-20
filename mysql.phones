@@ -1,0 +1,6 @@
+select `brands`.`name` as `brand`, `phones`.`mem`, `phones`.`model`, `cpus`.`name` as `cpu` from `kphp`.`phones` left join
+`kphp`.`cpus` on 
+`phones`.`cpu` = `cpus`.`id`
+left join 
+`kphp`.`brands` on 
+`phones`.`brand` = `brands`.`id`
