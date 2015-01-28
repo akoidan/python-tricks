@@ -2,6 +2,7 @@ __author__ = 'andrew'
 import re
 import sys
 
+
 def get_conf(conf):
     try:
         return {
@@ -12,7 +13,6 @@ def get_conf(conf):
         }[conf]
     except KeyError as e:
         return None
-
 
 
 if __name__ == "__main__":
