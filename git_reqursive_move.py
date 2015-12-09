@@ -1,5 +1,6 @@
 dir = "src"
 to_dir = "dst"
+""" find -type f > lol """
 
 with open("%s/lol" % dir) as f:
 	content = f.readlines()
