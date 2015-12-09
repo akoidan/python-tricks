@@ -1,3 +1,4 @@
+"""git status > lol7"""
 
 with open("/tmp/base/lol7") as f:
 	content = f.readlines()
