@@ -1,4 +1,5 @@
-"""git status > lol7"""
+print("run this command in your git repo 'git status > lol7'")
+print("CAUTION!!! It wil execute 'git reset' in the middle!!!!")
 merge_only = "SKIP_THIS_PATH"
 
 with open("/tmp/base/lol7") as f:
