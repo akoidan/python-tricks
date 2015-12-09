@@ -1,5 +1,5 @@
 """git status > lol7"""
-merge_only = "path_to_replace"
+merge_only = "SKIP_THIS_PATH"
 
 with open("/tmp/base/lol7") as f:
 	content = f.readlines()
