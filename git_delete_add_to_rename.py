@@ -1,4 +1,5 @@
 """git status > lol7"""
+merge_only = "path_to_replace"
 
 with open("/tmp/base/lol7") as f:
 	content = f.readlines()
@@ -10,7 +11,7 @@ with open("/tmp/base/lol7") as f:
 		rsplit = dst.rsplit('/', 1)
 		class_name = rsplit[-1].strip()
 		path = rsplit[0].strip()
-		if path.startswith("rst-app"):
+		if path.startswith(merge_only):
 			continue
 		if "new file" in action:
 			actions.setdefault(class_name, {})['to'] = path
