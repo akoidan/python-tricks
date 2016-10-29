@@ -1,0 +1,27 @@
+class A:
+	def __init__(self, n):
+		self.a = n
+
+	def lol(self):
+		print(self.a)
+
+
+class B:
+
+	def __init__(self, a, n):
+		self.a = a
+		self.n = n
+		def do_smth(instance):
+			print('got callback on B instance {}, with A instance {}'.format(self.n, instance.a))
+		a.lol = type(self.a.lol)(do_smth, self.a)
+
+	def koko(self):
+		print('Running method with B instance {}'.format(self.n))
+		self.a.lol()
+
+
+b1 = B(A(4), 1)
+b2 = B(A(5), 2)
+b1.koko()
+b2.koko()
+
