@@ -13,7 +13,13 @@ class B:
 		self.n = n
 		def do_smth(instance):
 			print('got callback on B instance {}, with A instance {}'.format(self.n, instance.a))
-		a.lol = type(self.a.lol)(do_smth, self.a)
+		self.bad_patch(do_smth)
+
+	def good_patch(self, do_smth):
+		self.a.lol = type(self.a.lol)(do_smth, self.a)
+
+	def bad_patch(self, do_smth):
+		A.lol = do_smth
 
 	def koko(self):
 		print('Running method with B instance {}'.format(self.n))
@@ -23,5 +29,4 @@ class B:
 b1 = B(A(4), 1)
 b2 = B(A(5), 2)
 b1.koko()
-b2.koko()
 
