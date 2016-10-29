@@ -1,0 +1,88 @@
+from tkinter import *
+
+class Move(object):
+	def __init__(self, size):
+		self.size = size
+		self.a = []
+		self.x = 0
+		self.y = 0
+		self.tier = 0
+		self.fill()
+		self.result = []
+
+	def fill(self):
+		for i in range(0, self.size):
+			k = []
+			self.a.append(k)
+			for j in range(0, self.size):
+				k.append("{}{}".format(i, j))
+
+
+	def right(self):
+		while self.x < self.size - self.tier - 1:
+			self.x += 1
+			self.sout()
+
+	def sout(self):
+		self.result.append({'x': self.x, 'y' : self.y})
+
+	def down(self):
+		while self.y < self.size - self.tier - 1 :
+			self.y += 1
+			self.sout()
+
+
+	def left(self):
+		while self.x > self.tier:
+			self.x -= 1
+			self.sout()
+
+
+	def up(self):
+		while self.y > self.tier + 1:
+			self.y -= 1
+			self.sout()
+
+
+	def move(self):
+		self.sout()
+		while self.tier <= self.size / 2:
+			self.right()
+			self.down()
+			self.left()
+			self.up()
+			self.tier += 1
+
+
+class Ball(object):
+
+	def __init__(self, size, number):
+		self.root = Tk()
+		self.root.title = "Game"
+		self.root.resizable(0, 0)
+		self.root.wm_attributes("-topmost", 1)
+		self.canvas = Canvas(self.root, width=size, height=size, bd=0, highlightthickness=0)
+		self.canvas.pack()
+		self.proportion = size / number
+		self.m = Move(number)
+		self.m.move()
+		self.index = 0
+
+	def draw(self):
+		self.canvas.delete('all')
+		self.index += 1
+		if self.index < len(self.m.result):
+			coord = self.m.result[self.index]
+			x = coord['x'] * self.proportion
+			y = coord['y'] * self.proportion
+			self.id = self.canvas.create_oval(x, y, x + self.proportion, y + self.proportion, fill="red")
+			self.canvas.after(100, self.draw)
+
+	def start(self):
+		self.draw()  # Changed per Bryan Oakley's comment.
+		self.root.mainloop()
+
+b = Ball(700, 10)
+b.start()
+
+
