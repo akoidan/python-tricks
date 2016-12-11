@@ -10,30 +10,39 @@ html = """
 	<title>Title</title>
 	<style>
 		pre {
-			max-height: calc( 100vh - 60px);
+			max-height: calc(100vh - 60px);
 			overflow-y: auto;
 		}
 	</style>
 	<script>
 
-		function doPost(data) {
-			var r = new XMLHttpRequest();
-			/*Firefox doesn't accept null*/
-			r.onreadystatechange = function () {
-				if (r.readyState === 4 && r.status === 200) {
-					var pre = document.getElementById('pre');
-					pre.textContent = pre.textContent + new Date().getMinutes() + ":" + new Date().getSeconds() +'>>'+r.responseText+'\\n';
-					pre.scrollTop = pre.scrollHeight
-				}
-			};
-			r.open("POST", '');
-			r.send(data);
+		function sliceZero(number, count) {
+			return String("00" + number).slice(count || -2);
 		}
 
+		document.addEventListener("DOMContentLoaded", function () {
+			var pre = document.getElementById('pre');
+		});
+		var ws;
 		function doSubmit() {
 			window.event.preventDefault();
-			doPost(document.getElementById('message').value)
+			ws.send(document.getElementById('message').value);
 		}
+
+		function onMessage(message) {
+			var data = message.data.substring(1);
+			var pref = message.data.indexOf('S') == 0 ? ">>" : "<<";
+			var time = sliceZero(new Date().getMinutes()) + ":"+sliceZero(new Date().getSeconds());
+			var newMesasge =  time + pref + data + '\n';
+			pre.textContent = pre.textContent + newMesasge;
+			pre.scrollTop = pre.scrollHeight;
+		}
+		function openWs() {
+			ws = new WebSocket('ws://' + window.location.host + '/ws');
+			ws.onmessage = onMessage;
+		}
+		openWs();
+		ws.onclose = function () { setTimeout(openWs, 1000); }
 	</script>
 </head>
 <body>
@@ -46,36 +55,65 @@ html = """
 </body>
 </html>
 """
-wsHandlers = []
+androidHandlers = []
+serverHandlers = []
 
 
-class MainHandler(WebSocketHandler):
-
-    def post(self):
-        for handler in wsHandlers:
-            handler.write_message(self.request.body)
-        self.write('{}: "{}"'.format(len(wsHandlers), self.request.body))
-
+class PageHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write(html)
+        with open('./lol2.html', 'rb') as f:
+            data = f.read()
+            self.write(data)
+        self.finish()
 
+
+class ServerHandler(WebSocketHandler):
     def open(self):
-        wsHandlers.append(self)
-        print('opened new connection')
-        self.write_message('asdas')
+        serverHandlers.append(self)
+        print('Opened connection for browser')
 
     def on_close(self):
-        wsHandlers.remove(self)
-        print('closed new connection')
+        serverHandlers.remove(self)
+        print('Cpened connection for browser')
+
+    def broadcast(self, message):
+        for handler in androidHandlers:
+            handler.write_message(message)
+
+    def on_message(self, message):
+        self.broadcast(message)
+        self.write_message('S{}: "{}"'.format(len(androidHandlers), message))
+
+
+class AndroidHandler(WebSocketHandler):
+    def open(self):
+        print('Opened connection for android')
+        self.broadcast('Opened connection for android')
+        androidHandlers.append(self)
+
+    def on_close(self):
+        androidHandlers.remove(self)
+        self.broadcast('Closed connection for android')
+        print('Closed connection for android')
+
+    def broadcast(self, message):
+        for handler in serverHandlers:
+            handler.write_message("A"+message)
+
+    def on_message(self, message):
+        self.broadcast(message)
+
 
 def make_app():
     return tornado.web.Application([
-        (r"/", MainHandler),
+        (r"/page", PageHandler),
+        (r"/", AndroidHandler),
+        (r"/ws", ServerHandler),
     ])
 
 if __name__ == "__main__":
     app = make_app()
     app.listen(9999)
-    print('http://localhost:9999')
+    print('http://localhost:9999/page')
     tornado.ioloop.IOLoop.current().start()
 
