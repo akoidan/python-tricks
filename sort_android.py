@@ -9,7 +9,7 @@ android = [
 	'drawable-mdpi',
 	'drawable-hdpi',
 	'drawable-xhdpi',
-	'drawable-xxhpdi',
+	'drawable-xxhdpi',
 	'drawable-xxxhdpi'
 ]
 
@@ -35,5 +35,5 @@ for directory in dirs:
 		img_struct[match_res.group('res')] = join(src_dir, directory, image)
 	i = 0
 	for k in sorted(img_struct):
-		print('cp {} {}'.format(img_struct[k], join(dst_dir, android[i], name+ext)))
+		print('cp -i {} {}'.format(img_struct[k], join(dst_dir, android[i], name+ext)))
 		i += 1
